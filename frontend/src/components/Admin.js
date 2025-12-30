@@ -14,7 +14,7 @@ function Admin() {
 
   const fetchMenu = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/menu");
+      const res = await axios.get("https://coffee-shop-online-ordering-react-backend.onrender.com/menu");
       setMenuItems(res.data);
     } catch (err) {
       console.log(err);
@@ -44,10 +44,10 @@ function Admin() {
 
     try {
       if (editId) {
-        await axios.post(`http://localhost:5000/modify/${editId}`, formData);
+        await axios.post(`https://coffee-shop-online-ordering-react-backend.onrender.com/modify/${editId}`, formData);
         alert("Item Updated Successfully!");
       } else {
-        await axios.post("http://localhost:5000/create", formData);
+        await axios.post("https://coffee-shop-online-ordering-react-backend.onrender.com/create", formData);
         alert("Item Added Successfully!");
       }
       
@@ -64,7 +64,7 @@ function Admin() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this coffee?")) {
       try {
-        await axios.delete(`http://localhost:5000/menu/${id}`);
+        await axios.delete(`https://coffee-shop-online-ordering-react-backend.onrender.com/menu/${id}`);
         fetchMenu(); 
       } catch (err) {
         console.log(err);
@@ -130,7 +130,7 @@ function Admin() {
           <div className="list-grid">
             {menuItems.map((item) => (
               <div key={item.id} className="list-item">
-                <img src={`http://localhost:5000/images/${item.image}`} alt={item.name} />
+                <img src={`https://coffee-shop-online-ordering-react-backend.onrender.com/images/${item.image}`} alt={item.name} />
                 <div className="item-details">
                   <h3>{item.name}</h3>
                   <p>${item.price}</p>

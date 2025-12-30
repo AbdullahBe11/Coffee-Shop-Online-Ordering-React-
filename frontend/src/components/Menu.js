@@ -10,7 +10,7 @@ function Menu() {
   useEffect(() => {
     const fetchAllMenu = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/menu");
+        const res = await axios.get("https://coffee-shop-online-ordering-react-backend.onrender.com/menu");
         setProducts(res.data);
       } catch (err) {
         console.log(err);
@@ -29,7 +29,7 @@ function Menu() {
           <div className="menu-item" key={item.id}>
             
             <img 
-              src={`http://localhost:5000/images/${item.image}`} 
+              src={`https://coffee-shop-online-ordering-react-backend.onrender.com/images/${item.image}`} 
               alt={item.name}
               onError={(e) => { e.target.src = "https://via.placeholder.com/150" }} 
             />
