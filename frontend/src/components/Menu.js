@@ -5,15 +5,26 @@ import axios from 'axios';
 
 function Menu() {
   const [products, setProducts] = useState([]);
+  const [debugError, setDebugError] = useState(null);
 
-  
   useEffect(() => {
     const fetchAllMenu = async () => {
       try {
         const res = await axios.get("https://coffee-shop-online-ordering-react-backend.onrender.com/menu");
-        setProducts(res.data);
+        console.log("Raw Data:", res.data);
+
+        // CHECK: Is it a list or an error?
+        if (Array.isArray(res.data)) {
+            setProducts(res.data);
+        } else {
+            // It's not a list! It's likely an error object.
+            // Let's save it to show the user.
+            setDebugError(res.data);
+            setProducts([]); 
+        }
       } catch (err) {
         console.log(err);
+        setDebugError(err.message);
       }
     };
     fetchAllMenu();
@@ -22,12 +33,19 @@ function Menu() {
   return (
     <div className="Menu">
       <h1>Our Coffee Menu ☕</h1>
-      <p>Choose your favorite brew and enjoy the perfect cup of coffee.</p>
+
+      {/* 🚨 DEBUG SECTION: Shows us exactly what is wrong */}
+      {debugError && (
+        <div style={{background: '#ffcccc', color: 'red', padding: '20px', margin: '20px', border: '2px solid red', fontWeight: 'bold'}}>
+            <h3>⚠️ BACKEND ERROR DETECTED:</h3>
+            <pre>{JSON.stringify(debugError, null, 2)}</pre>
+            <p>Please send a screenshot of this red box to Gemini!</p>
+        </div>
+      )}
 
       <div className="menu-grid">
         {products.map((item) => (
           <div className="menu-item" key={item.id}>
-            
             <img 
               src={`https://coffee-shop-online-ordering-react-backend.onrender.com/images/${item.image}`} 
               alt={item.name}
