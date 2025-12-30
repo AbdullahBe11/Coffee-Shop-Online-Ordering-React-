@@ -7,23 +7,24 @@ const fs = require("fs");
 
 const app = express();
 
-// Middleware
+
 app.use(cors());
 app.use(express.json());
 
-// SERVE IMAGES STATICALLY (Crucial for your frontend to see images)
-// __dirname works automatically here because we removed "type": "module"
+
 app.use("/images", express.static(path.join(__dirname, "images")));
 
-// Database Connection
+
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "coffeeshop", 
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME, 
+    port: process.env.DB_PORT,
+    ssl:{rejectUnauthorized:false},
 });
 
-// Multer Storage for Image Uploads
+
 const storage = multer.diskStorage({
     destination: (req, res, cb) => {
         cb(null, "images/");
@@ -34,9 +35,9 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// --- ROUTES ---
 
-// 1. GET ALL MENU ITEMS
+
+
 app.get("/menu", (req, res) => {
     const q = "SELECT * FROM menu";
     db.query(q, (err, data) => {
@@ -45,7 +46,7 @@ app.get("/menu", (req, res) => {
     });
 });
 
-// 2. GET SINGLE ITEM
+
 app.get('/search/:id', (req, res) => {
     const id = req.params.id;
     const q = "SELECT * FROM menu WHERE id = ?";
@@ -55,10 +56,10 @@ app.get('/search/:id', (req, res) => {
     });
 });
 
-// 3. CREATE ITEM (Admin)
+
 app.post("/create", upload.single('image'), (req, res) => {
     const q = "INSERT INTO menu(`name`, `price`, `image`) VALUES (?,?,?)";
-    // Check if a file was actually uploaded
+    
     const imageFilename = req.file ? req.file.filename : ""; 
 
     db.query(q, [req.body.name, req.body.price, imageFilename], (err, data) => {
@@ -67,11 +68,11 @@ app.post("/create", upload.single('image'), (req, res) => {
     });
 });
 
-// 4. DELETE ITEM (Fixed Logic)
+
 app.delete("/menu/:id", (req, res) => {
     const id = req.params.id;
 
-    // First: Find the image name so we can delete the file
+    
     const qGetImage = "SELECT image FROM menu WHERE id = ?";
     db.query(qGetImage, [id], (err, data) => {
         if (err) return res.json(err);
@@ -79,12 +80,12 @@ app.delete("/menu/:id", (req, res) => {
 
         const imageFileName = data[0].image;
 
-        // Second: Delete from Database
+        
         const qDelete = "DELETE FROM menu WHERE id = ?";
         db.query(qDelete, [id], (err2, data2) => {
             if (err2) return res.status(500).json(err2);
 
-            // Third: Delete the actual file from the folder
+            
             if (imageFileName) {
                 const filePath = path.join(__dirname, "images", imageFileName);
                 fs.unlink(filePath, (err3) => {
@@ -96,7 +97,7 @@ app.delete("/menu/:id", (req, res) => {
     });
 });
 
-// 5. UPDATE ITEM (Admin)
+
 app.post("/modify/:id", upload.single('image'), (req, res) => {
     const id = req.params.id;
     const { name, price } = req.body;
@@ -105,11 +106,11 @@ app.post("/modify/:id", upload.single('image'), (req, res) => {
     let values = [];
 
     if (req.file) {
-        // If they uploaded a new image, update everything
+        
         q = "UPDATE menu SET `name`= ?, `price`= ?, `image` = ? WHERE id = ?";
         values = [name, price, req.file.filename, id];
     } else {
-        // If they didn't upload an image, keep the old one
+        
         q = "UPDATE menu SET `name`= ?, `price`= ? WHERE id = ?";
         values = [name, price, id];
     }
@@ -120,7 +121,7 @@ app.post("/modify/:id", upload.single('image'), (req, res) => {
     });
 });
 
-// 6. PLACE ORDER (New Route)
+
 app.post("/orders", (req, res) => {
     const { customer_name, total_amount, items } = req.body;
 
@@ -140,5 +141,5 @@ app.post("/orders", (req, res) => {
 });
 
 app.listen(5000 || process.env.PORT, () => {
-    console.log("Connected to backend on port 5000");
+    console.log("Connected to backend ");
 });
