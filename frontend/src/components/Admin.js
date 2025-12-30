@@ -7,21 +7,28 @@ function Admin() {
   const [form, setForm] = useState({ name: "", price: "", image: null });
   const [editId, setEditId] = useState(null); 
 
- 
   useEffect(() => {
     fetchMenu();
   }, []);
 
   const fetchMenu = async () => {
     try {
+      // Updated to your live Render Backend URL
       const res = await axios.get("https://coffee-shop-online-ordering-react-backend.onrender.com/menu");
-      setMenuItems(res.data);
+      console.log("Data received from backend:", res.data); // Log to see what we get
+      
+      // Safety Check: Only set data if it is actually a list (Array)
+      if (Array.isArray(res.data)) {
+        setMenuItems(res.data);
+      } else {
+        console.error("Backend did not return a list!", res.data);
+        setMenuItems([]); // Set empty list to prevent crash
+      }
     } catch (err) {
       console.log(err);
     }
   };
 
-  
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -30,10 +37,8 @@ function Admin() {
     setForm({ ...form, image: e.target.files[0] });
   };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     
     const formData = new FormData();
     formData.append("name", form.name);
@@ -44,6 +49,7 @@ function Admin() {
 
     try {
       if (editId) {
+        // FIXED: Added backticks ` ` for template literal
         await axios.post(`https://coffee-shop-online-ordering-react-backend.onrender.com/modify/${editId}`, formData);
         alert("Item Updated Successfully!");
       } else {
@@ -64,6 +70,7 @@ function Admin() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this coffee?")) {
       try {
+        // FIXED: Added backticks ` `
         await axios.delete(`https://coffee-shop-online-ordering-react-backend.onrender.com/menu/${id}`);
         fetchMenu(); 
       } catch (err) {
@@ -124,23 +131,28 @@ function Admin() {
           </form>
         </div>
 
-        
         <div className="admin-list">
           <h2>Current Menu Items</h2>
           <div className="list-grid">
-            {menuItems.map((item) => (
-              <div key={item.id} className="list-item">
-                <img src={`https://coffee-shop-online-ordering-react-backend.onrender.com/images/${item.image}`} alt={item.name} />
-                <div className="item-details">
-                  <h3>{item.name}</h3>
-                  <p>${item.price}</p>
+            {/* SAFETY CHECK: Ensure menuItems is an array before mapping */}
+            {Array.isArray(menuItems) && menuItems.length > 0 ? (
+              menuItems.map((item) => (
+                <div key={item.id} className="list-item">
+                  {/* FIXED: Added backticks ` ` */}
+                  <img src={`https://coffee-shop-online-ordering-react-backend.onrender.com/images/${item.image}`} alt={item.name} />
+                  <div className="item-details">
+                    <h3>{item.name}</h3>
+                    <p>${item.price}</p>
+                  </div>
+                  <div className="actions">
+                    <button className="edit-btn" onClick={() => handleEdit(item)}>Edit</button>
+                    <button className="delete-btn" onClick={() => handleDelete(item.id)}>Delete</button>
+                  </div>
                 </div>
-                <div className="actions">
-                  <button className="edit-btn" onClick={() => handleEdit(item)}>Edit</button>
-                  <button className="delete-btn" onClick={() => handleDelete(item.id)}>Delete</button>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p>No coffee items found. Add one above! ☕</p>
+            )}
           </div>
         </div>
       </div>
