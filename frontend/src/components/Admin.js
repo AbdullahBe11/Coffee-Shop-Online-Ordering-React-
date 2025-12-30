@@ -1,0 +1,151 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import '../styles/Admin.css'; 
+
+function Admin() {
+  const [menuItems, setMenuItems] = useState([]);
+  const [form, setForm] = useState({ name: "", price: "", image: null });
+  const [editId, setEditId] = useState(null); 
+
+ 
+  useEffect(() => {
+    fetchMenu();
+  }, []);
+
+  const fetchMenu = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/menu");
+      setMenuItems(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e) => {
+    setForm({ ...form, image: e.target.files[0] });
+  };
+
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("price", form.price);
+    if (form.image) {
+      formData.append("image", form.image);
+    }
+
+    try {
+      if (editId) {
+        await axios.post(`http://localhost:5000/modify/${editId}`, formData);
+        alert("Item Updated Successfully!");
+      } else {
+        await axios.post("http://localhost:5000/create", formData);
+        alert("Item Added Successfully!");
+      }
+      
+      setForm({ name: "", price: "", image: null });
+      setEditId(null);
+      fetchMenu(); 
+
+    } catch (err) {
+      console.log(err);
+      alert("Error saving item");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this coffee?")) {
+      try {
+        await axios.delete(`http://localhost:5000/menu/${id}`);
+        fetchMenu(); 
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
+  const handleEdit = (item) => {
+    setEditId(item.id);
+    setForm({ name: item.name, price: item.price, image: null }); 
+    window.scrollTo(0, 0); 
+  };
+
+  return (
+    <div className="Admin">
+      <h1>Admin Dashboard ⚙️</h1>
+      
+      <div className="admin-container">
+        <div className="admin-form">
+          <h2>{editId ? "Update Coffee" : "Add New Coffee"}</h2>
+          <form onSubmit={handleSubmit}>
+            <input 
+              type="text" 
+              name="name" 
+              placeholder="Coffee Name (e.g. Latte)" 
+              value={form.name} 
+              onChange={handleChange} 
+              required 
+            />
+            <input 
+              type="number" 
+              name="price" 
+              placeholder="Price (e.g. 4.50)" 
+              value={form.price} 
+              onChange={handleChange} 
+              required 
+            />
+            <input 
+              type="file" 
+              name="image" 
+              onChange={handleFileChange} 
+              required={!editId} 
+            />
+            
+            <button type="submit" className={editId ? "update-btn" : "add-btn"}>
+              {editId ? "Update Item" : "Add Item"}
+            </button>
+            
+            {editId && (
+              <button type="button" className="cancel-btn" onClick={() => {
+                setEditId(null);
+                setForm({ name: "", price: "", image: null });
+              }}>
+                Cancel Edit
+              </button>
+            )}
+          </form>
+        </div>
+
+        
+        <div className="admin-list">
+          <h2>Current Menu Items</h2>
+          <div className="list-grid">
+            {menuItems.map((item) => (
+              <div key={item.id} className="list-item">
+                <img src={`http://localhost:5000/images/${item.image}`} alt={item.name} />
+                <div className="item-details">
+                  <h3>{item.name}</h3>
+                  <p>${item.price}</p>
+                </div>
+                <div className="actions">
+                  <button className="edit-btn" onClick={() => handleEdit(item)}>Edit</button>
+                  <button className="delete-btn" onClick={() => handleDelete(item.id)}>Delete</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Admin;

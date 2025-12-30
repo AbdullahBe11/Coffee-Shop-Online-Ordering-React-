@@ -1,0 +1,94 @@
+.Admin {
+  padding: 40px 20px;
+  background-color: #f4f4f4;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+}
+
+.admin-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* FORM STYLES */
+.admin-form {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.admin-form input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.admin-form button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  margin-right: 10px;
+  transition: 0.3s;
+}
+
+.add-btn { background-color: #28a745; color: white; }
+.add-btn:hover { background-color: #218838; }
+
+.update-btn { background-color: #ffc107; color: black; }
+.update-btn:hover { background-color: #e0a800; }
+
+.cancel-btn { background-color: #6c757d; color: white; }
+.cancel-btn:hover { background-color: #5a6268; }
+
+/* LIST STYLES */
+.list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.list-item {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list-item img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.item-details {
+  flex: 1;
+  text-align: left;
+  padding-left: 15px;
+}
+
+.actions button {
+  padding: 5px 10px;
+  margin-left: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-btn { background-color: #007bff; color: white; }
+.delete-btn { background-color: #dc3545; color: white; }
