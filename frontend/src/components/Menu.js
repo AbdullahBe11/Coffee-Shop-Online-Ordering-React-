@@ -30,6 +30,7 @@ function Menu() {
     fetchAllMenu();
   }, []);
 
+  console.log("Products (render):", products);
   return (
     <div className="Menu">
       <h1>Our Coffee Menu ☕</h1>
@@ -44,17 +45,25 @@ function Menu() {
       )}
 
       <div className="menu-grid">
-        {products.map((item) => (
-          <div className="menu-item" key={item.id}>
-            <img 
-              src={`https://coffee-shop-online-ordering-react-backend.onrender.com/images/${item.image}`} 
-              alt={item.name}
-              onError={(e) => { e.target.src = "https://via.placeholder.com/150" }} 
-            />
-            <h3>{item.name}</h3>
-            <p>${item.price}</p>
+        {!Array.isArray(products) ? (
+          <div style={{padding: '20px', color: '#444'}}>
+            ⚠️ Unexpected menu format — expected an array. Check the backend response (see debug box above).
           </div>
-        ))}
+        ) : products.length === 0 ? (
+          <div style={{padding: '20px', color: '#444'}}>No menu items found.</div>
+        ) : (
+          products.map((item) => (
+            <div className="menu-item" key={item.id}>
+              <img 
+                src={`https://coffee-shop-online-ordering-react-backend.onrender.com/images/${item.image}`} 
+                alt={item.name}
+                onError={(e) => { e.target.src = "https://via.placeholder.com/150" }} 
+              />
+              <h3>{item.name}</h3>
+              <p>${item.price}</p>
+            </div>
+          ))
+        )}
       </div>
       
       <section className="footer">
