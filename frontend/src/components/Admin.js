@@ -13,16 +13,16 @@ function Admin() {
 
   const fetchMenu = async () => {
     try {
-      // Updated to your live Render Backend URL
-      const res = await axios.get("https://coffee-shop-online-ordering-react-backend.onrender.com/menu");
-      console.log("Data received from backend:", res.data); // Log to see what we get
       
-      // Safety Check: Only set data if it is actually a list (Array)
+      const res = await axios.get("https://coffee-shop-online-ordering-react-backend.onrender.com/menu");
+      console.log("Data received from backend:", res.data); 
+      
+      
       if (Array.isArray(res.data)) {
         setMenuItems(res.data);
       } else {
         console.error("Backend did not return a list!", res.data);
-        setMenuItems([]); // Set empty list to prevent crash
+        setMenuItems([]); 
       }
     } catch (err) {
       console.log(err);
@@ -49,7 +49,7 @@ function Admin() {
 
     try {
       if (editId) {
-        // FIXED: Added backticks ` ` for template literal
+        
         await axios.post(`https://coffee-shop-online-ordering-react-backend.onrender.com/modify/${editId}`, formData);
         alert("Item Updated Successfully!");
       } else {
