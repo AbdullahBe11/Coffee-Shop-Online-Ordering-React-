@@ -134,11 +134,9 @@ function Admin() {
         <div className="admin-list">
           <h2>Current Menu Items</h2>
           <div className="list-grid">
-            {/* SAFETY CHECK: Ensure menuItems is an array before mapping */}
             {Array.isArray(menuItems) && menuItems.length > 0 ? (
               menuItems.map((item) => (
                 <div key={item.id} className="list-item">
-                  {/* FIXED: Added backticks ` ` */}
                   <img src={`https://coffee-shop-online-ordering-react-backend.onrender.com/images/${item.image}`} alt={item.name} />
                   <div className="item-details">
                     <h3>{item.name}</h3>
