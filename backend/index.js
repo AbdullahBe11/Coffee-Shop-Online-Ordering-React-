@@ -1,29 +1,57 @@
 const express = require("express");
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const app = express();
-
 
 app.use(cors());
 app.use(express.json());
 
-
 app.use("/images", express.static(path.join(__dirname, "images")));
 
+// 🟢 FIX 1: Add Pool Settings (connectionLimit, queueLimit)
+const dbOptions = {
+    host: process.env.DB_HOST || "mysql-245f1ff5-coffee-shop-online-ordering.h.aivencloud.com", // Fallback to your host
+    user: process.env.DB_USER || "avnadmin",
+    password: process.env.DB_PASSWORD || "AVNS_tS4Zn6z4Kp9hnjGUk0G", // Fallback to your password
+    database: process.env.DB_NAME || "defaultdb",
+    port: process.env.DB_PORT || 10608,
+    waitForConnections: true,
+    connectionLimit: 10, // Allows 10 users at once
+    queueLimit: 0
+};
 
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME, 
-    port: process.env.DB_PORT,
-    ssl:{rejectUnauthorized:false},
-});
+// SSL Configuration
+if (process.env.DB_CA_BASE64) {
+  try {
+    const caPath = path.join(__dirname, 'aiven-ca.pem');
+    fs.writeFileSync(caPath, Buffer.from(process.env.DB_CA_BASE64, 'base64'));
+    dbOptions.ssl = { ca: fs.readFileSync(caPath) };
+    console.log('Loaded DB CA from DB_CA_BASE64');
+  } catch (e) {
+    console.warn("Failed to write DB_CA_BASE64:", e.message);
+  }
+} else if (process.env.DB_CA_PATH) {
+  try {
+    dbOptions.ssl = { ca: fs.readFileSync(process.env.DB_CA_PATH) };
+  } catch (e) {
+    console.warn("Failed to load DB_CA_PATH:", e.message);
+  }
+} else {
+  // Default to simple SSL if no certificates are provided (common for Aiven)
+  dbOptions.ssl = { rejectUnauthorized: false };
+} 
 
+// 🟢 FIX 2: Use createPool instead of createConnection
+const db = mysql.createPool(dbOptions);
+
+// 🟢 FIX 3: DELETE "db.connect(...)". Pools connect automatically!
 
 const storage = multer.diskStorage({
     destination: (req, res, cb) => {
@@ -36,15 +64,34 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-
-
 app.get("/menu", (req, res) => {
     const q = "SELECT * FROM menu";
     db.query(q, (err, data) => {
-        if (err) return res.json(err);
+        if (err) {
+            console.error('GET /menu DB error:', err);
+            return res.status(500).json({ error: 'Database error', details: err.message });
+        }
         return res.json(data);
     });
 });
+
+// Health check endpoint for debugging connectivity
+app.get('/health', (req, res) => {
+    db.query('SELECT 1', (err) => {
+        if (err) {
+            console.error('Health check failed:', err);
+            return res.status(500).json({ status: 'error', error: err.message });
+        }
+        return res.json({ status: 'ok' });
+    });
+});
+
+// Optional debug endpoint (enabled only when DEBUG env var is 'true')
+if (process.env.DEBUG === 'true') {
+    app.get('/debug', (req, res) => {
+        return res.json({ host: process.env.DB_HOST, port: process.env.DB_PORT, database: process.env.DB_NAME });
+    });
+}
 
 
 app.get('/search/:id', (req, res) => {
@@ -140,6 +187,7 @@ app.post("/orders", (req, res) => {
     });
 });
 
-app.listen(5000 || process.env.PORT, () => {
-    console.log("Connected to backend ");
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Backend running on port ${PORT}`);
 });
