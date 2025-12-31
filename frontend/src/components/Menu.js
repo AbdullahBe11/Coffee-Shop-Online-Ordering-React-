@@ -5,65 +5,50 @@ import axios from 'axios';
 
 function Menu() {
   const [products, setProducts] = useState([]);
-  const [debugError, setDebugError] = useState(null);
+
+  
+  const API_BASE = process.env.REACT_APP_API_URL || '';
 
   useEffect(() => {
     const fetchAllMenu = async () => {
       try {
-        const res = await axios.get("https://coffee-shop-online-ordering-react-backend.onrender.com/menu");
-        console.log("Raw Data:", res.data);
-
-        // CHECK: Is it a list or an error?
-        if (Array.isArray(res.data)) {
-            setProducts(res.data);
-        } else {
-            // It's not a list! It's likely an error object.
-            // Let's save it to show the user.
-            setDebugError(res.data);
-            setProducts([]); 
-        }
+        const url = `${API_BASE}/menu`;
+        const res = await axios.get(url);
+        setProducts(res.data);
       } catch (err) {
-        console.log(err);
-        setDebugError(err.message);
+        console.error('Failed to load menu:', err.message || err);
       }
     };
     fetchAllMenu();
   }, []);
 
-  console.log("Products (render):", products);
+  const makeImageSrc = (image) => {
+    if (!image) return 'https://via.placeholder.com/150';
+    if (typeof image === 'string') {
+      if (image.startsWith('http://') || image.startsWith('https://')) return image;
+      if (image.length > 200 && !image.includes('.')) return `data:image/*;base64,${image}`;
+      return `${API_BASE}/images/${image}`;
+    }
+    return 'https://via.placeholder.com/150';
+  };
+
   return (
     <div className="Menu">
       <h1>Our Coffee Menu ☕</h1>
-
-      {/* 🚨 DEBUG SECTION: Shows us exactly what is wrong */}
-      {debugError && (
-        <div style={{background: '#ffcccc', color: 'red', padding: '20px', margin: '20px', border: '2px solid red', fontWeight: 'bold'}}>
-            <h3>⚠️ BACKEND ERROR DETECTED:</h3>
-            <pre>{JSON.stringify(debugError, null, 2)}</pre>
-            <p>Please send a screenshot of this red box to Gemini!</p>
-        </div>
-      )}
+      <p>Choose your favorite brew and enjoy the perfect cup of coffee.</p>
 
       <div className="menu-grid">
-        {!Array.isArray(products) ? (
-          <div style={{padding: '20px', color: '#444'}}>
-            ⚠️ Unexpected menu format — expected an array. Check the backend response (see debug box above).
+        {products.map((item) => (
+          <div className="menu-item" key={item.id}>
+            <img
+              src={makeImageSrc(item.image)}
+              alt={item.name}
+              onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }}
+            />
+            <h3>{item.name}</h3>
+            <p>${Number(item.price).toFixed(2)}</p>
           </div>
-        ) : products.length === 0 ? (
-          <div style={{padding: '20px', color: '#444'}}>No menu items found.</div>
-        ) : (
-          products.map((item) => (
-            <div className="menu-item" key={item.id}>
-              <img 
-                src={`https://coffee-shop-online-ordering-react-backend.onrender.com/images/${item.image}`} 
-                alt={item.name}
-                onError={(e) => { e.target.src = "https://via.placeholder.com/150" }} 
-              />
-              <h3>{item.name}</h3>
-              <p>${item.price}</p>
-            </div>
-          ))
-        )}
+        ))}
       </div>
       
       <section className="footer">
