@@ -15,19 +15,19 @@ app.use(express.json());
 
 app.use("/images", express.static(path.join(__dirname, "images")));
 
-// 🟢 FIX 1: Add Pool Settings (connectionLimit, queueLimit)
+
 const dbOptions = {
-    host: process.env.DB_HOST || "mysql-245f1ff5-coffee-shop-online-ordering.h.aivencloud.com", // Fallback to your host
+    host: process.env.DB_HOST || "mysql-245f1ff5-coffee-shop-online-ordering.h.aivencloud.com", 
     user: process.env.DB_USER || "avnadmin",
-    password: process.env.DB_PASSWORD || "AVNS_tS4Zn6z4Kp9hnjGUk0G", // Fallback to your password
+    password: process.env.DB_PASSWORD || "AVNS_tS4Zn6z4Kp9hnjGUk0G", 
     database: process.env.DB_NAME || "defaultdb",
     port: process.env.DB_PORT || 10608,
     waitForConnections: true,
-    connectionLimit: 10, // Allows 10 users at once
+    connectionLimit: 10, 
     queueLimit: 0
 };
 
-// SSL Configuration
+
 if (process.env.DB_CA_BASE64) {
   try {
     const caPath = path.join(__dirname, 'aiven-ca.pem');
@@ -44,14 +44,14 @@ if (process.env.DB_CA_BASE64) {
     console.warn("Failed to load DB_CA_PATH:", e.message);
   }
 } else {
-  // Default to simple SSL if no certificates are provided (common for Aiven)
+ 
   dbOptions.ssl = { rejectUnauthorized: false };
 } 
 
-// 🟢 FIX 2: Use createPool instead of createConnection
+
 const db = mysql.createPool(dbOptions);
 
-// 🟢 FIX 3: DELETE "db.connect(...)". Pools connect automatically!
+
 
 const storage = multer.diskStorage({
     destination: (req, res, cb) => {
@@ -75,7 +75,7 @@ app.get("/menu", (req, res) => {
     });
 });
 
-// Health check endpoint for debugging connectivity
+
 app.get('/health', (req, res) => {
     db.query('SELECT 1', (err) => {
         if (err) {
@@ -86,7 +86,7 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Optional debug endpoint (enabled only when DEBUG env var is 'true')
+
 if (process.env.DEBUG === 'true') {
     app.get('/debug', (req, res) => {
         return res.json({ host: process.env.DB_HOST, port: process.env.DB_PORT, database: process.env.DB_NAME });
