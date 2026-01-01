@@ -170,3 +170,34 @@
     "footer";
   }
 }
+
+@media (max-width: 768px) {
+  .home {
+    flex-direction: column; 
+    text-align: center;
+    padding: 20px;
+  }
+
+  
+  .headerContainer {
+    width: 100%;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .headerContainer h1 {
+    font-size: 40px; 
+  }
+
+  .headerContainer p {
+    font-size: 20px;
+  }
+
+  
+  .headerContainer button {
+    width: 80%;
+    margin-top: 20px;
+  }
+}

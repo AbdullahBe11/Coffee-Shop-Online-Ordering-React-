@@ -143,3 +143,26 @@
     display: none;
   }
 }
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column; /* Stack logo and links */
+    align-items: center;
+    padding: 10px;
+  }
+
+  .links {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column; /* Stack links vertically */
+    gap: 15px; /* Space between links */
+    text-align: center;
+    width: 100%;
+  }
+
+  .links a {
+    font-size: 18px; /* Make text bigger for touching */
+    padding: 10px;
+    background-color: #f4f4f4; /* Light background for easy clicking */
+    border-radius: 5px;
+  }
+}

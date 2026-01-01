@@ -22,3 +22,19 @@
 .footer h2{
   color: rgb(255, 255, 255);
 }
+
+@media (max-width: 768px) {
+  .footer {
+    text-align: center;
+    padding: 20px;
+  }
+
+  .socialMedia {
+    margin-bottom: 15px;
+  }
+  
+  .socialMedia svg {
+    font-size: 30px; 
+    margin: 10px;
+  }
+}
