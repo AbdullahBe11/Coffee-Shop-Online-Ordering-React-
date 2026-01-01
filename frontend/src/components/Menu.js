@@ -5,48 +5,53 @@ import axios from 'axios';
 
 function Menu() {
   const [products, setProducts] = useState([]);
-
-  
-  const API_BASE = process.env.REACT_APP_API_URL || '';
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchAllMenu = async () => {
       try {
-        const url = `${API_BASE}/menu`;
-        const res = await axios.get(url);
-        setProducts(res.data);
+        const res = await axios.get("https://coffee-shop-online-ordering-react-backend.onrender.com/menu");
+        console.log("Backend Response:", res.data); 
+
+        
+        if (Array.isArray(res.data)) {
+            setProducts(res.data);
+        } else {
+            console.error("CRITICAL: Backend sent an error instead of a list:", res.data);
+            setError(res.data); 
+            setProducts([]);    
+        }
       } catch (err) {
-        console.error('Failed to load menu:', err.message || err);
+        console.log(err);
+        setError(err);
       }
     };
     fetchAllMenu();
   }, []);
 
-  const makeImageSrc = (image) => {
-    if (!image) return 'https://via.placeholder.com/150';
-    if (typeof image === 'string') {
-      if (image.startsWith('http://') || image.startsWith('https://')) return image;
-      if (image.length > 200 && !image.includes('.')) return `data:image/*;base64,${image}`;
-      return `${API_BASE}/images/${image}`;
-    }
-    return 'https://via.placeholder.com/150';
-  };
-
   return (
     <div className="Menu">
       <h1>Our Coffee Menu ☕</h1>
-      <p>Choose your favorite brew and enjoy the perfect cup of coffee.</p>
+      
+      
+      {error && (
+        <div style={{border: '2px solid red', padding: '20px', margin: '20px', background: '#ffe6e6', color: 'red'}}>
+            <h3>⚠️ We have a problem!</h3>
+            <p>The backend sent this error instead of the menu:</p>
+            <pre>{JSON.stringify(error, null, 2)}</pre>
+        </div>
+      )}
 
       <div className="menu-grid">
         {products.map((item) => (
           <div className="menu-item" key={item.id}>
-            <img
-              src={makeImageSrc(item.image)}
+            <img 
+              src={`https://coffee-shop-online-ordering-react-backend.onrender.com/images/${item.image}`} 
               alt={item.name}
-              onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }}
+              onError={(e) => { e.target.src = "https://via.placeholder.com/150" }} 
             />
             <h3>{item.name}</h3>
-            <p>${Number(item.price).toFixed(2)}</p>
+            <p>${item.price}</p>
           </div>
         ))}
       </div>
