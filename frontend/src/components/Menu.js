@@ -10,16 +10,18 @@ function Menu() {
   useEffect(() => {
     const fetchAllMenu = async () => {
       try {
+        // ✅ Using your LIVE Render Backend
         const res = await axios.get("https://coffee-shop-online-ordering-react-backend.onrender.com/menu");
         console.log("Backend Response:", res.data); 
 
-        
+        // 🛡️ SAFETY CHECK: Only update if it is a real list
         if (Array.isArray(res.data)) {
             setProducts(res.data);
+            setError(false);
         } else {
-            console.error("CRITICAL: Backend sent an error instead of a list:", res.data);
-            setError(res.data); 
-            setProducts([]);    
+            console.error("Backend sent an error instead of a list:", res.data);
+            setError(res.data); // Save the error to show it in Red Box
+            setProducts([]);    // Keep empty to prevent crash
         }
       } catch (err) {
         console.log(err);
@@ -32,13 +34,13 @@ function Menu() {
   return (
     <div className="Menu">
       <h1>Our Coffee Menu ☕</h1>
-      
-      
+
+      {/* 🚨 DEBUG RED BOX: Shows the real error instead of crashing */}
       {error && (
-        <div style={{border: '2px solid red', padding: '20px', margin: '20px', background: '#ffe6e6', color: 'red'}}>
-            <h3>⚠️ We have a problem!</h3>
-            <p>The backend sent this error instead of the menu:</p>
+        <div style={{background: '#ffcccc', color: 'red', padding: '20px', margin: '20px', border: '2px solid red', fontWeight: 'bold'}}>
+            <h3>⚠️ BACKEND ERROR:</h3>
             <pre>{JSON.stringify(error, null, 2)}</pre>
+            <p>Please send a screenshot of this box to Gemini!</p>
         </div>
       )}
 
