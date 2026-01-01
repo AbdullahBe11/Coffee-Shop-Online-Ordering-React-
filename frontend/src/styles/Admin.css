@@ -14,7 +14,7 @@
   gap: 40px;
 }
 
-/* FORM STYLES */
+
 .admin-form {
   background: white;
   padding: 30px;
@@ -52,7 +52,7 @@
 .cancel-btn { background-color: #6c757d; color: white; }
 .cancel-btn:hover { background-color: #5a6268; }
 
-/* LIST STYLES */
+
 .list-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

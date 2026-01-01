@@ -145,7 +145,7 @@
 }
 @media (max-width: 768px) {
   .navbar {
-    flex-direction: column; /* Stack logo and links */
+    flex-direction: column; 
     align-items: center;
     padding: 10px;
   }
@@ -153,16 +153,48 @@
   .links {
     margin-top: 15px;
     display: flex;
-    flex-direction: column; /* Stack links vertically */
-    gap: 15px; /* Space between links */
+    flex-direction: column; 
+    gap: 15px; 
     text-align: center;
     width: 100%;
   }
 
   .links a {
-    font-size: 18px; /* Make text bigger for touching */
+    font-size: 18px; 
     padding: 10px;
-    background-color: #f4f4f4; /* Light background for easy clicking */
+    background-color: #f4f4f4; 
     border-radius: 5px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    
+    height: auto !important; 
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 20px; 
+  }
+
+  
+  .links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    
+    
+    background-color: #1a1a1a; 
+    margin-top: 15px;
+    gap: 15px;
+  }
+
+  .links a {
+    color: white;
+    font-size: 20px;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    display: block; 
   }
 }
