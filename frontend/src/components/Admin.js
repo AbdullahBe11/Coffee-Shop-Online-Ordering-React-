@@ -70,7 +70,7 @@ function Admin() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this coffee?")) {
       try {
-        // FIXED: Added backticks ` `
+        
         await axios.delete(`https://coffee-shop-online-ordering-react-backend.onrender.com/menu/${id}`);
         fetchMenu(); 
       } catch (err) {
